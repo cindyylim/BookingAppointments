@@ -37,8 +37,7 @@ A full-stack booking system with:
    ```
 2. **Configure PostgreSQL:**
    - Create `src/main/resources/application.properties` updating the db-name, username, password, gmail username and app password:
-   ```
-   # Database
+   ```# Database
 spring.datasource.url=jdbc:postgresql://localhost:5432/<db-name>
 spring.datasource.username=<username>
 spring.datasource.password=<password>
@@ -58,8 +57,7 @@ spring.mail.properties.mail.smtp.starttls.enable=true
 spring.mail.properties.mail.smtp.starttls.required=true
 spring.mail.properties.mail.smtp.connectiontimeout=5000
 spring.mail.properties.mail.smtp.timeout=5000
-spring.mail.properties.mail.smtp.writetimeout=5000
-```
+spring.mail.properties.mail.smtp.writetimeout=5000```
    - Create a database and user (see `src/main/resources/application.properties` for defaults)
    - Example:
      ```sql
