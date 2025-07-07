@@ -36,8 +36,9 @@ A full-stack booking system with:
    cd booking-system
    ```
 2. **Configure PostgreSQL:**
-   - Create `src/main/resources/application.properties` updating the db-name, username, password, gmail username and app password:
-   ```# Database
+   - Create `src/main/resources/application.properties`:
+```
+# Database
 spring.datasource.url=jdbc:postgresql://localhost:5432/<db-name>
 spring.datasource.username=<username>
 spring.datasource.password=<password>
@@ -57,13 +58,15 @@ spring.mail.properties.mail.smtp.starttls.enable=true
 spring.mail.properties.mail.smtp.starttls.required=true
 spring.mail.properties.mail.smtp.connectiontimeout=5000
 spring.mail.properties.mail.smtp.timeout=5000
-spring.mail.properties.mail.smtp.writetimeout=5000```
+spring.mail.properties.mail.smtp.writetimeout=5000
+```
    - Create a database and user (see `src/main/resources/application.properties` for defaults)
    - Example:
      ```sql
      CREATE DATABASE bookingdb;
      CREATE USER bookinguser WITH PASSWORD 'bookingpass';
      GRANT ALL PRIVILEGES ON DATABASE bookingdb TO bookinguser;
+     GRANT CREATE ON SCHEMA public TO bookinguser;
      ```
 3. **Configure email (Gmail SMTP):**
    - Edit `src/main/resources/application.properties` with your Gmail and app password.
