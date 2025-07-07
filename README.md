@@ -13,7 +13,7 @@ A full-stack booking system with:
 - Book appointments as a guest or registered user
 - View available time slots in a calendar (local time zone)
 - Email confirmation with cancellation link
-- User dashboard: upcoming bookings, history, profile edit, cancel
+- User dashboard: upcoming bookings, history bookings, profile edit, cancel bookings
 - Admin: create/delete time slots, admin login/logout
 
 ## Tech Stack
