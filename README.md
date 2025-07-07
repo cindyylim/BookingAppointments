@@ -36,6 +36,30 @@ A full-stack booking system with:
    cd booking-system
    ```
 2. **Configure PostgreSQL:**
+   - Create `src/main/resources/application.properties` updating the db-name, username, password, gmail username and app password:
+   ```
+   # Database
+spring.datasource.url=jdbc:postgresql://localhost:5432/<db-name>
+spring.datasource.username=<username>
+spring.datasource.password=<password>
+
+# JPA/Hibernate
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+# Email (Gmail SMTP)
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=<your_gmail_address@gmail.com>
+spring.mail.password=<your_gmail_app_password>
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+spring.mail.properties.mail.smtp.starttls.required=true
+spring.mail.properties.mail.smtp.connectiontimeout=5000
+spring.mail.properties.mail.smtp.timeout=5000
+spring.mail.properties.mail.smtp.writetimeout=5000
+```
    - Create a database and user (see `src/main/resources/application.properties` for defaults)
    - Example:
      ```sql
