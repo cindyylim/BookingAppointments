@@ -1,6 +1,11 @@
 // AppointmentForm.js
 // Form for booking an appointment for a selected time slot.
 import React, { useState } from 'react';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 
 function AppointmentForm({ timeSlot, onBooked, onCancel }) {
   const prev = timeSlot.previousAppointment || {};
@@ -14,11 +19,9 @@ function AppointmentForm({ timeSlot, onBooked, onCancel }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    // If modifying, cancel the old appointment first
     if (timeSlot.previousAppointment && timeSlot.previousAppointment.cancellationToken) {
       await fetch(`/api/appointments/cancel/${timeSlot.previousAppointment.cancellationToken}`, { method: 'DELETE' });
     }
-    // Now book the new appointment
     const token = localStorage.getItem('jwt');
     const headers = { 'Content-Type': 'application/json' };
     if (token) {
@@ -45,31 +48,59 @@ function AppointmentForm({ timeSlot, onBooked, onCancel }) {
   };
 
   return (
-    <div>
-      <h2>Book Appointment</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Name: <input value={customerName} onChange={e => setCustomerName(e.target.value)} required /></label>
-        </div>
-        <div>
-          <label>Email: <input value={customerEmail} onChange={e => setCustomerEmail(e.target.value)} required /></label>
-        </div>
-        <div>
-          <label>Phone: <input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} required /></label>
-        </div>
-        <div>
-          <label>Service: <input value={service} onChange={e => setService(e.target.value)} required /></label>
-        </div>
-        <div>
-          <label>Location: <input value={location} onChange={e => setLocation(e.target.value)} required /></label>
-        </div>
-        <div>
-          <button type="submit">Book</button>
-          <button type="button" onClick={onCancel}>Cancel</button>
-        </div>
-        {error && <div style={{color:'red'}}>{error}</div>}
-      </form>
-    </div>
+    <Paper elevation={3} sx={{ p: 4, maxWidth: 500, mx: 'auto', mt: 4 }}>
+      <Typography variant="h5" sx={{ mb: 2, fontWeight: 600 }}>Book Appointment</Typography>
+      <Typography variant="subtitle1" sx={{ mb: 3 }}>
+        {new Date(timeSlot.startTime).toLocaleString()} - {new Date(timeSlot.endTime).toLocaleTimeString()}
+      </Typography>
+      <Box component="form" onSubmit={handleSubmit}>
+        <TextField
+          label="Name"
+          value={customerName}
+          onChange={e => setCustomerName(e.target.value)}
+          required
+          fullWidth
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          label="Email"
+          value={customerEmail}
+          onChange={e => setCustomerEmail(e.target.value)}
+          required
+          fullWidth
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          label="Phone"
+          value={customerPhone}
+          onChange={e => setCustomerPhone(e.target.value)}
+          required
+          fullWidth
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          label="Service"
+          value={service}
+          onChange={e => setService(e.target.value)}
+          required
+          fullWidth
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          label="Location"
+          value={location}
+          onChange={e => setLocation(e.target.value)}
+          required
+          fullWidth
+          sx={{ mb: 2 }}
+        />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+          <Button type="submit" variant="contained" color="primary">Book</Button>
+          <Button type="button" variant="outlined" color="secondary" onClick={onCancel}>Cancel</Button>
+        </Box>
+        {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
+      </Box>
+    </Paper>
   );
 }
 

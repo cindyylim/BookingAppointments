@@ -1,6 +1,6 @@
 // TimeSlotAdmin.js
 // Admin interface to create and delete time slots.
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 
 function TimeSlotAdmin({ credentials }) {
   const [timeSlots, setTimeSlots] = useState([]);
@@ -9,7 +9,7 @@ function TimeSlotAdmin({ credentials }) {
   const [endTime, setEndTime] = useState('');
   const [error, setError] = useState('');
 
-  const fetchTimeSlots = () => {
+  const fetchTimeSlots = useCallback(() => {
     fetch('/api/timeslots', {
       headers: credentials ? { 'Authorization': 'Basic ' + btoa(credentials.username + ':' + credentials.password) } : {}
     })
@@ -18,11 +18,11 @@ function TimeSlotAdmin({ credentials }) {
         setTimeSlots(data);
         setLoading(false);
       });
-  };
+  }, [credentials]);
 
   useEffect(() => {
     fetchTimeSlots();
-  }, []);
+  }, [fetchTimeSlots]);
 
   const handleCreate = async (e) => {
     e.preventDefault();

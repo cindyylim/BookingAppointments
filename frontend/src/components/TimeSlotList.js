@@ -8,6 +8,11 @@ import startOfWeek from 'date-fns/startOfWeek';
 import getDay from 'date-fns/getDay';
 import enUS from 'date-fns/locale/en-US';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 
 const locales = {
   'en-US': enUS,
@@ -36,13 +41,25 @@ function TimeSlotList({ onBook }) {
   }, []);
 
   const events = useMemo(() =>
-    timeSlots.filter(ts => ts.available).map(ts => ({
-      id: ts.id,
-      title: 'Available',
-      start: new Date(ts.startTime),
-      end: new Date(ts.endTime),
-      resource: ts,
-    })),
+    timeSlots.filter(ts => ts.available).map(ts => {
+      const start = new Date(ts.startTime);
+      const end = new Date(ts.endTime);
+      const localStart = new Date(
+        start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate(),
+        start.getUTCHours(), start.getUTCMinutes(), start.getUTCSeconds()
+      );
+      const localEnd = new Date(
+        end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate(),
+        end.getUTCHours(), end.getUTCMinutes(), end.getUTCSeconds()
+      );
+      return {
+        id: ts.id,
+        title: 'Available',
+        start: localStart,
+        end: localEnd,
+        resource: ts,
+      };
+    }),
     [timeSlots]
   );
 
@@ -53,31 +70,46 @@ function TimeSlotList({ onBook }) {
   if (loading) return <div>Loading time slots...</div>;
 
   return (
-    <div>
-      <h2>Available Time Slots</h2>
-      <Calendar
-        localizer={localizer}
-        events={events}
-        startAccessor="start"
-        endAccessor="end"
-        style={{ height: 500 }}
-        views={{ week: true, day: true }}
-        view={view}
-        date={date}
-        onView={setView}
-        onNavigate={setDate}
-        onSelectEvent={handleSelectEvent}
-        selectable={false}
-        popup
-        defaultView={Views.WEEK}
-        messages={{ week: 'Week', day: 'Day' }}
-      />
-      <div style={{marginTop: 10}}>
-        <button onClick={() => setView(Views.WEEK)} disabled={view === Views.WEEK}>Week View</button>
-        <button onClick={() => setView(Views.DAY)} disabled={view === Views.DAY} style={{marginLeft: 10}}>Day View</button>
-      </div>
-      <p style={{marginTop: 10}}>Click an available slot to book it.</p>
-    </div>
+    <Card elevation={3} sx={{ p: 3, mt: 4 }}>
+      <CardContent>
+        <Typography variant="h5" sx={{ mb: 2, fontWeight: 600 }}>Available Time Slots</Typography>
+        <Box sx={{ mb: 2 }}>
+          <Button onClick={() => setView(Views.WEEK)} disabled={view === Views.WEEK} variant={view === Views.WEEK ? 'contained' : 'outlined'} sx={{ mr: 2 }}>Week View</Button>
+          <Button onClick={() => setView(Views.DAY)} disabled={view === Views.DAY} variant={view === Views.DAY ? 'contained' : 'outlined'}>Day View</Button>
+        </Box>
+        <Box sx={{ height: 500, background: '#f8fafc', borderRadius: 2, p: 1 }}>
+          <Calendar
+            localizer={localizer}
+            events={events}
+            startAccessor="start"
+            endAccessor="end"
+            views={{ week: true, day: true }}
+            view={view}
+            date={date}
+            onView={setView}
+            onNavigate={setDate}
+            onSelectEvent={handleSelectEvent}
+            selectable={false}
+            popup
+            defaultView={Views.WEEK}
+            messages={{ week: 'Week', day: 'Day' }}
+            components={{
+              event: ({ event }) => (
+                <Box sx={{ p: 0.5 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    {new Date(event.start).toLocaleString()} - {new Date(event.end).toLocaleTimeString()}<br/>
+                    <strong>{event.title}</strong>
+                  </Typography>
+                </Box>
+              )
+            }}
+          />
+        </Box>
+        <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>
+          Click an available slot to book it.
+        </Typography>
+      </CardContent>
+    </Card>
   );
 }
 
