@@ -1,6 +1,8 @@
 package com.example.booking.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 public class Appointment {
@@ -17,10 +19,12 @@ public class Appointment {
 
     @ManyToOne
     @JoinColumn(name = "time_slot_id")
+    @JsonManagedReference
     private com.example.booking.model.TimeSlot timeSlot;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
     // Getters and setters

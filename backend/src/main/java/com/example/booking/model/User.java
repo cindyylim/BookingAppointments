@@ -1,6 +1,8 @@
 package com.example.booking.model;
 
 import jakarta.persistence.*;
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonManagedReference;  
 
 @Entity
 @Table(name = "users")
@@ -16,6 +18,9 @@ public class User {
     private String email;
     private String phone;
 
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
+    private List<Appointment> appointments;
     // Getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -27,4 +32,6 @@ public class User {
     public void setEmail(String email) { this.email = email; }
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
+    public List<Appointment> getAppointments() { return appointments; }
+    public void setAppointments(List<Appointment> appointments) { this.appointments = appointments; }
 } 

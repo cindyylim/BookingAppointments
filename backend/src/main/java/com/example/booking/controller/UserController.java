@@ -15,6 +15,7 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/user")
@@ -26,8 +27,9 @@ public class UserController {
 
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile(Authentication auth) {
-        User user = userRepository.findByUsername(auth.getName()).orElse(null);
-        if (user == null) return ResponseEntity.status(404).body("User not found");
+        Optional<User> optionalUser = userRepository.findByUsername(auth.getName());
+        if (optionalUser.isEmpty()) return ResponseEntity.status(404).body("User not found");
+        User user = optionalUser.get();
         return ResponseEntity.ok(Map.of(
             "username", user.getUsername(),
             "email", user.getEmail(),
@@ -37,8 +39,9 @@ public class UserController {
 
     @PutMapping("/profile")
     public ResponseEntity<?> updateProfile(Authentication auth, @RequestBody Map<String, String> req) {
-        User user = userRepository.findByUsername(auth.getName()).orElse(null);
-        if (user == null) return ResponseEntity.status(404).body("User not found");
+        Optional<User> optionalUser = userRepository.findByUsername(auth.getName());
+        if (optionalUser.isEmpty()) return ResponseEntity.status(404).body("User not found");
+        User user = optionalUser.get();        
         user.setEmail(req.getOrDefault("email", user.getEmail()));
         user.setPhone(req.getOrDefault("phone", user.getPhone()));
         userRepository.save(user);
@@ -47,11 +50,11 @@ public class UserController {
 
     @GetMapping("/appointments")
     public ResponseEntity<?> getUserAppointments(Authentication auth) {
-        User user = userRepository.findByUsername(auth.getName()).orElse(null);
-        if (user == null) return ResponseEntity.status(404).body("User not found");
-        List<Appointment> all = appointmentRepository.findAll().stream()
-            .filter(a -> a.getUser() != null && a.getUser().getId().equals(user.getId()))
-            .collect(Collectors.toList());
+       Optional<User> optionalUser = userRepository.findByUsername(auth.getName());
+        if (optionalUser.isEmpty()) return ResponseEntity.status(404).body("User not found");
+        User user = optionalUser.get();
+        List<Appointment> all = appointmentRepository.findByUserId(user.getId());
+        if (all.isEmpty()) return ResponseEntity.ok(Map.of("upcoming", List.of(), "history", List.of()));
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
         List<Appointment> upcoming = all.stream().filter(a -> a.getTimeSlot().getStartTime().isAfter(now)).collect(Collectors.toList());
         List<Appointment> history = all.stream().filter(a -> a.getTimeSlot().getStartTime().isBefore(now)).collect(Collectors.toList());

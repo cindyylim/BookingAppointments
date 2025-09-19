@@ -8,6 +8,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -19,24 +24,26 @@ public class AuthController {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody Map<String, String> req) {
-        if (userRepository.findByUsername(req.get("username")).isPresent() ||
-            userRepository.findByEmail(req.get("email")).isPresent()) {
-            return ResponseEntity.badRequest().body("Username or email already exists");
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest req) {
+        if (userRepository.findByUsername(req.getUsername()).isPresent() ||
+            userRepository.findByEmail(req.getEmail()).isPresent()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Username or email already exists"));
         }
+
         User user = new User();
-        user.setUsername(req.get("username"));
-        user.setPassword(passwordEncoder.encode(req.get("password")));
-        user.setEmail(req.get("email"));
-        user.setPhone(req.get("phone"));
+        user.setUsername(req.getUsername());
+        user.setPassword(passwordEncoder.encode(req.getPassword()));
+        user.setEmail(req.getEmail());
+        user.setPhone(req.getPhone());
+
         userRepository.save(user);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> req) {
-        return userRepository.findByUsername(req.get("username")).map(user -> {
-            if (passwordEncoder.matches(req.get("password"), user.getPassword())) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {
+        return userRepository.findByUsername(req.getUsername()).map(user -> {
+            if (passwordEncoder.matches(req.getPassword(), user.getPassword())) {
                 String token = jwtUtil.generateToken(user.getUsername());
                 return ResponseEntity.ok(Map.of(
                     "token", token,
@@ -47,8 +54,46 @@ public class AuthController {
                     )
                 ));
             } else {
-                return ResponseEntity.status(401).body("Invalid credentials");
+                return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"));
             }
-        }).orElse(ResponseEntity.status(401).body("Invalid credentials"));
+        }).orElse(ResponseEntity.status(401).body(Map.of("error", "Invalid credentials")));
     }
+
+
+public static class RegisterRequest {
+    @NotBlank
+    private String username;
+
+    @NotBlank
+    @Size(min = 6)
+    private String password;
+
+    @Email
+    @NotBlank
+    private String email;
+
+    @NotBlank
+    @Pattern(regexp = "^\\d{10}$")
+    private String phone;
+
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+}
+
+// dto/LoginRequest.java
+public static class LoginRequest {
+    private String username;
+    private String password;
+
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+}
 } 

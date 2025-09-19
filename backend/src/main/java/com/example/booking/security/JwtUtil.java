@@ -4,12 +4,17 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
+import io.jsonwebtoken.ExpiredJwtException;
 
 import java.util.Date;
 
 @Component
 public class JwtUtil {
-    private final String SECRET = "ReplaceWithAStrongSecretKey";
+
+    @Value("${jwt.secret}")
+    private String SECRET;
+
     private final long EXPIRATION = 1000 * 60 * 60 * 24; // 24 hours
 
     public String generateToken(String username) {
@@ -29,12 +34,18 @@ public class JwtUtil {
         try {
             Claims claims = getClaims(token);
             return !claims.getExpiration().before(new Date());
+        } catch (ExpiredJwtException e) {
+            System.out.println("Token expired");
         } catch (Exception e) {
-            return false;
+            System.out.println("Invalid token");
         }
+        return false;
     }
 
     private Claims getClaims(String token) {
-        return Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody();
+        return Jwts.parser()
+                .setSigningKey(SECRET)
+                .parseClaimsJws(token)
+                .getBody();
     }
-} 
+}

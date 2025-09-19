@@ -41,25 +41,20 @@ function TimeSlotList({ onBook }) {
   }, []);
 
   const events = useMemo(() =>
-    timeSlots.filter(ts => ts.available).map(ts => {
-      const start = new Date(ts.startTime);
-      const end = new Date(ts.endTime);
-      const localStart = new Date(
-        start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate(),
-        start.getUTCHours(), start.getUTCMinutes(), start.getUTCSeconds()
-      );
-      const localEnd = new Date(
-        end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate(),
-        end.getUTCHours(), end.getUTCMinutes(), end.getUTCSeconds()
-      );
-      return {
-        id: ts.id,
-        title: 'Available',
-        start: localStart,
-        end: localEnd,
-        resource: ts,
-      };
-    }),
+    timeSlots
+      .filter(ts => ts.available)
+      .map(ts => {
+        const start = new Date(ts.startTime);
+        const end = new Date(ts.endTime);
+  
+        return {
+          id: ts.id,
+          title: 'Available',
+          start: start, // already local time
+          end: end,     // already local time
+          resource: ts,
+        };
+      }),
     [timeSlots]
   );
 

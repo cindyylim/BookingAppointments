@@ -93,9 +93,7 @@ public class AppointmentService {
     }
 
     public boolean cancelAppointmentByToken(String token) {
-        Appointment appointment = appointmentRepository.findAll().stream()
-            .filter(a -> token.equals(a.getCancellationToken()))
-            .findFirst().orElse(null);
+        Appointment appointment = appointmentRepository.findByCancellationToken(token);
         if (appointment == null) return false;
         TimeSlot slot = appointment.getTimeSlot();
         if (slot != null) {
