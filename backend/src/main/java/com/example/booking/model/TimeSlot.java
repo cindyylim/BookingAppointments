@@ -3,7 +3,7 @@ package com.example.booking.model;
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonBackReference;  
+import com.fasterxml.jackson.annotation.JsonManagedReference;  
 
 @Entity
 public class TimeSlot {
@@ -18,7 +18,7 @@ public class TimeSlot {
     private boolean available = true;
 
     @OneToMany(mappedBy = "timeSlot")
-    @JsonBackReference
+    @JsonManagedReference
     private List<Appointment> appointments;
     // Getters and setters
     public Long getId() { return id; }

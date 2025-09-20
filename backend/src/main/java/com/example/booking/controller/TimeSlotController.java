@@ -11,11 +11,24 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 import java.time.Instant;
 import java.util.List;
+import com.example.booking.mapper.TimeSlotMapper;
+import com.example.booking.dto.TimeSlotDTO;
+import com.example.booking.dto.TimeSlotDTO;
+import com.example.booking.mapper.TimeSlotMapper;
+import com.example.booking.model.TimeSlot;
+import com.example.booking.repository.TimeSlotRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/timeslots")
 public class TimeSlotController {
-
+    @Autowired
+    private TimeSlotRepository timeSlotRepository;
     private final TimeSlotService timeSlotService;
 
     public TimeSlotController(TimeSlotService timeSlotService) {
@@ -23,15 +36,20 @@ public class TimeSlotController {
     }
 
     @GetMapping
-    public List<TimeSlot> getAllTimeSlots() {
-        return timeSlotService.getAllTimeSlots();
+    public List<TimeSlotDTO> getAllTimeSlots() {
+        List<TimeSlotDTO> dtos = timeSlotRepository.findAll().stream()
+            .map(TimeSlotMapper::toDTO)
+            .collect(Collectors.toList());
+        return dtos;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TimeSlot> getTimeSlot(@PathVariable Long id) {
-        return timeSlotService.getTimeSlot(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<TimeSlotDTO> getTimeSlot(@PathVariable Long id) {
+        TimeSlot timeSlot = timeSlotRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TimeSlot not found"));
+
+        TimeSlotDTO dto = TimeSlotMapper.toDTO(timeSlot);
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping

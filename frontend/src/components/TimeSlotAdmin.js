@@ -61,7 +61,6 @@ function TimeSlotAdmin({ credentials }) {
     });
     fetchTimeSlots();
   };
-
   return (
     <div>
       <h2>Admin: Manage Time Slots</h2>
@@ -80,6 +79,11 @@ function TimeSlotAdmin({ credentials }) {
           {timeSlots.map(ts => (
             <li key={ts.id}>
               {new Date(ts.startTime).toLocaleString()} - {new Date(ts.endTime).toLocaleString()} (Available: {ts.available ? 'Yes' : 'No'})
+              {ts.appointments.map((appointment, index) => (
+                <div key={index}>
+                  Name: {appointment.clientName}, Email: {appointment.clientEmail}, Phone: {appointment.clientPhone}, Service: {appointment.service} @ {appointment.location}
+                </div>
+              ))}
               <button style={{marginLeft: 10}} onClick={() => handleDelete(ts.id)}>Delete</button>
             </li>
           ))}
